@@ -1,0 +1,66 @@
+/* Brand variables */
+:root {
+  --brand-primary: #0d6efd;
+  --brand-dark: #0b1220;
+  --hero-overlay: rgba(0, 0, 0, 0.45);
+}
+
+/* Base */
+html, body {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #ffffff;
+}
+
+/* Navbar spacing */
+body > nav.navbar {
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Hero */
+.hero {
+  min-height: 88vh;
+  background-image: linear-gradient(var(--hero-overlay), var(--hero-overlay)), url('https://images.unsplash.com/photo-1493558103817-58b2924bce98?q=80&w=1920&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+  padding-top: 72px; /* navbar offset */
+  padding-bottom: 48px;
+}
+
+.hero .btn-outline-light:hover {
+  color: #0b1220;
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+/* Cards */
+.destination-card img {
+  height: 180px;
+  object-fit: cover;
+}
+
+.badge-category {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+/* Footer */
+footer a {
+  opacity: 0.8;
+}
+footer a:hover { opacity: 1; }
+
+/* Form tweaks */
+.form-label { font-weight: 600; }
+
+/* Responsive helpers */
+@media (max-width: 575.98px) {
+  .hero {
+    min-height: 78vh;
+  }
+}
+
+

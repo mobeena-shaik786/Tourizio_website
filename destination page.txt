@@ -1,0 +1,96 @@
+import { Component } from '@angular/core';
+
+type DestinationType = 'Beach' | 'Hill Station' | 'City' | 'Heritage' | 'Wildlife' | 'Desert' | 'Island' | 'Backwaters';
+
+interface Destination {
+  id: number;
+  name: string;
+  location: string;
+  type: DestinationType;
+  description: string;
+  imageUrl: string;
+  price: number; // price per person (INR)
+  rating: number; // 1..5
+  days: number; // suggested duration
+}
+
+type SortKey = 'priceLowHigh' | 'priceHighLow' | 'ratingHighLow' | 'nameAZ';
+
+@Component({
+  selector: 'app-destinations',
+  templateUrl: './destinations.component.html',
+  styleUrls: ['./destinations.component.css']
+})
+export class DestinationsComponent {
+  // UI state
+  searchText = '';
+  selectedType: '' | DestinationType = '';
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy: SortKey = 'ratingHighLow';
+
+  destinationTypes: DestinationType[] = ['Beach', 'Hill Station', 'City', 'Heritage', 'Wildlife', 'Desert', 'Island', 'Backwaters'];
+
+  // 20+ curated Indian destinations with prices
+  destinations: Destination[] = [
+    { id: 1,  name: 'Goa Beaches', location: 'Goa', type: 'Beach', description: 'Golden sands, nightlife, water sports.', imageUrl: 'assets/destinations/goa.jpg', price: 12999, rating: 4.6, days: 4 },
+    { id: 2,  name: 'Ooty', location: 'Tamil Nadu', type: 'Hill Station', description: 'Tea gardens, toy train, misty hills.', imageUrl: 'assets/destinations/ooty.jpg', price: 9999, rating: 4.4, days: 3 },
+    { id: 3,  name: 'Manali', location: 'Himachal Pradesh', type: 'Hill Station', description: 'Snow peaks, adventure sports, Solang Valley.', imageUrl: 'assets/destinations/manali.jpg', price: 14999, rating: 4.7, days: 5 },
+    { id: 4,  name: 'Jaipur', location: 'Rajasthan', type: 'Heritage', description: 'Pink city palaces, forts, rich culture.', imageUrl: 'assets/destinations/jaipur.jpg', price: 10999, rating: 4.5, days: 3 },
+    { id: 5,  name: 'Udaipur', location: 'Rajasthan', type: 'Heritage', description: 'City of lakes, royal architecture.', imageUrl: 'assets/destinations/udaipur.jpg', price: 12499, rating: 4.6, days: 3 },
+    { id: 6,  name: 'Agra', location: 'Uttar Pradesh', type: 'Heritage', description: 'Taj Mahal and Mughal legacy.', imageUrl: 'assets/destinations/agra.jpg', price: 8999, rating: 4.8, days: 2 },
+    { id: 7,  name: 'Varanasi', location: 'Uttar Pradesh', type: 'Heritage', description: 'Ghats, Ganga aarti, spiritual aura.', imageUrl: 'assets/destinations/varanasi.jpg', price: 11499, rating: 4.6, days: 3 },
+    { id: 8,  name: 'Rishikesh', location: 'Uttarakhand', type: 'Wildlife', description: 'River rafting, yoga capital, Ganga banks.', imageUrl: 'assets/destinations/rishikesh.jpg', price: 10499, rating: 4.5, days: 3 },
+    { id: 9,  name: 'Jim Corbett', location: 'Uttarakhand', type: 'Wildlife', description: 'Tiger reserve, jungle safaris.', imageUrl: 'assets/destinations/corbett.jpg', price: 13999, rating: 4.4, days: 3 },
+    { id: 10, name: 'Andaman Islands', location: 'Andaman & Nicobar', type: 'Island', description: 'Pristine beaches, scuba diving, Radhanagar.', imageUrl: 'assets/destinations/andaman.jpg', price: 27999, rating: 4.7, days: 5 },
+    { id: 11, name: 'Alleppey Backwaters', location: 'Kerala', type: 'Backwaters', description: 'Houseboats, lagoons, serene canals.', imageUrl: 'assets/destinations/alleppey.jpg', price: 16999, rating: 4.6, days: 3 },
+    { id: 12, name: 'Munnar', location: 'Kerala', type: 'Hill Station', description: 'Tea estates, waterfalls, cool breeze.', imageUrl: 'assets/destinations/munnar.jpg', price: 11999, rating: 4.6, days: 3 },
+    { id: 13, name: 'Pondicherry', location: 'Puducherry', type: 'Beach', description: 'French quarters, cafes, beaches.', imageUrl: 'assets/destinations/pondy.jpg', price: 9999, rating: 4.3, days: 3 },
+    { id: 14, name: 'Hampi', location: 'Karnataka', type: 'Heritage', description: 'UNESCO ruins, boulder-strewn landscapes.', imageUrl: 'assets/destinations/hampi.jpg', price: 10999, rating: 4.7, days: 3 },
+    { id: 15, name: 'Rann of Kutch', location: 'Gujarat', type: 'Desert', description: 'White desert, Rann Utsav, salt flats.', imageUrl: 'assets/destinations/kutch.jpg', price: 15999, rating: 4.5, days: 3 },
+    { id: 16, name: 'Jaisalmer', location: 'Rajasthan', type: 'Desert', description: 'Golden fort, dunes, camel safaris.', imageUrl: 'assets/destinations/jaisalmer.jpg', price: 14499, rating: 4.6, days: 3 },
+    { id: 17, name: 'Kashmir (Gulmarg/Srinagar)', location: 'J&K', type: 'Hill Station', description: 'Shikara rides, snow meadows, paradise.', imageUrl: 'assets/destinations/kashmir.jpg', price: 24999, rating: 4.8, days: 5 },
+    { id: 18, name: 'Leh–Ladakh', location: 'Ladakh', type: 'Hill Station', description: 'High passes, Pangong, monasteries.', imageUrl: 'assets/destinations/ladakh.jpg', price: 31999, rating: 4.9, days: 6 },
+    { id: 19, name: 'Darjeeling', location: 'West Bengal', type: 'Hill Station', description: 'Toy train, tea gardens, Kanchenjunga views.', imageUrl: 'assets/destinations/darjeeling.jpg', price: 12999, rating: 4.5, days: 3 },
+    { id: 20, name: 'Shillong & Cherrapunji', location: 'Meghalaya', type: 'Hill Station', description: 'Living root bridges, waterfalls, clouds.', imageUrl: 'assets/destinations/shillong.jpg', price: 16999, rating: 4.7, days: 4 },
+    { id: 21, name: 'Kodaikanal', location: 'Tamil Nadu', type: 'Hill Station', description: 'Lakes, pine forests, cool climate.', imageUrl: 'assets/destinations/kodaikanal.jpg', price: 10999, rating: 4.4, days: 3 },
+    { id: 22, name: 'Mumbai City', location: 'Maharashtra', type: 'City', description: 'Marine Drive, Gateway, bustling vibes.', imageUrl: 'assets/destinations/mumbai.jpg', price: 11999, rating: 4.2, days: 3 },
+    { id: 23, name: 'Delhi Heritage', location: 'Delhi', type: 'City', description: 'Red Fort, Qutub Minar, markets.', imageUrl: 'assets/destinations/delhi.jpg', price: 9999, rating: 4.3, days: 3 },
+    { id: 24, name: 'Ranthambore', location: 'Rajasthan', type: 'Wildlife', description: 'Tiger safaris, forts, nature trails.', imageUrl: 'assets/destinations/ranthambore.jpg', price: 14999, rating: 4.5, days: 3 }
+  ];
+
+  private matchesSearch(d: Destination): boolean {
+    if (!this.searchText) return true;
+    const q = this.searchText.toLowerCase().trim();
+    return (
+      d.name.toLowerCase().includes(q) ||
+      d.location.toLowerCase().includes(q) ||
+      d.type.toLowerCase().includes(q)
+    );
+  }
+
+  private matchesType(d: Destination): boolean {
+    return this.selectedType ? d.type === this.selectedType : true;
+  }
+
+  private matchesPrice(d: Destination): boolean {
+    const aboveMin = this.minPrice != null ? d.price >= this.minPrice : true;
+    const belowMax = this.maxPrice != null ? d.price <= this.maxPrice : true;
+    return aboveMin && belowMax;
+  }
+
+  get filteredAndSorted(): Destination[] {
+    const filtered = this.destinations
+      .filter(d => this.matchesSearch(d))
+      .filter(d => this.matchesType(d))
+      .filter(d => this.matchesPrice(d));
+
+    switch (this.sortBy) {
+      case 'priceLowHigh': return filtered.sort((a, b) => a.price - b.price);
+      case 'priceHighLow': return filtered.sort((a, b) => b.price - a.price);
+      case 'nameAZ': return filtered.sort((a, b) => a.name.localeCompare(b.name));
+      case 'ratingHighLow':
+      default: return filtered.sort((a, b) => b.rating - a.rating);
+    }
+  }
+}

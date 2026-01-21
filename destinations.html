@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="tourizioApp">
+  <head>
+    <meta charset="utf-8" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tourizio — Destinations</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <style>
+  body {
+    background: url('https://media.istockphoto.com/id/1442611988/photo/couple-enjoying-the-view-on-top-mountain-overlooking-whitsundays-ocean.jpg?s=612x612&w=0&k=20&c=qxvMRiB0a-v38ix8YQArUnpz4XJ8KjyW8SajYgTrNFs=') no-repeat center center fixed;
+    background-size: cover;
+  }
+  .navbar { background: linear-gradient(90deg, #0d6efd, #6610f2) !important; }
+  .destination-card { border: 4px solid #000; overflow: hidden; }
+  .destination-card .card-img-top, .destination-card video { aspect-ratio: 16/9; object-fit: cover; }
+  .destination-card:hover { transform: translateY(-2px); box-shadow: 0 0.5rem 1.25rem rgba(13, 110, 253, 0.2) !important; }
+  .row.g-4 > div:nth-child(odd) .destination-card { background-color: #ffd6e7; }
+  .row.g-4 > div:nth-child(even) .destination-card { background-color: #e5e5e5; }
+  .badge-category { position: absolute; top: .75rem; left: .75rem; }
+  .form-select, .form-control { border-radius: .6rem; }
+  .btn-outline-primary { --bs-btn-color:#0d6efd; --bs-btn-border-color:#0d6efd; }
+  .btn-outline-primary:hover { background: linear-gradient(90deg, #0d6efd, #6610f2); border-color: transparent; color: #fff; }
+</style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  </head>
+  <body ng-controller="DestinationsController as vm">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="index.html#home">Tourizio</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+          aria-controls="navbarContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="index.html#home">Home</a></li>
+            <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Destinations</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#booking">Book a Tour</a></li>
+            <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main class="py-5" style="padding-top: 88px;">
+      <div class="container" data-reveal>
+        <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between mb-4 gap-3">
+          <div>
+            <h1 class="fw-bold mb-1">Explore Destinations</h1>
+            <p class="text-muted mb-0">Powered by AngularJS array module, with live filters.</p>
+          </div>
+          <form class="row gy-2 gx-2 align-items-end">
+            <div class="col-12 col-md-4">
+              <label for="q" class="form-label mb-1">Search</label>
+              <input id="q" type="search" class="form-control" placeholder="Try 'beach', 'mountain'..." ng-model="vm.query" />
+            </div>
+            <div class="col-6 col-md-3">
+              <label for="type" class="form-label mb-1">Type</label>
+              <select id="type" class="form-select" ng-model="vm.type">
+                <option value="">All</option>
+                <option ng-repeat="t in vm.types" ng-value="t">{{t}}</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <label for="sort" class="form-label mb-1">Sort</label>
+              <select id="sort" class="form-select" ng-model="vm.sort">
+                <option value="popular">Most Popular</option>
+                <option value="priceAsc">Price: Low to High</option>
+                <option value="priceDesc">Price: High to Low</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-2 d-grid">
+              <button type="button" class="btn btn-outline-secondary" ng-click="vm.reset()">Reset</button>
+            </div>
+          </form>
+        </div>
+        <h3 class="fw-semibold mb-3">India Destinations</h3>
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-sm-6 col-lg-4" ng-repeat="d in (vm.destinations | filter:vm.searchFn | filter:vm.countryFilter(true) | orderBy:vm.orderExpr:vm.orderReverse)">
+            <div class="card h-100 destination-card shadow-sm">
+              <div class="position-relative">
+                <span class="badge badge-category" ng-class="vm.badgeClass(d.type)">{{d.type}}</span>
+                <video ng-if="d.video" class="card-img-top" ng-attr-poster="{{d.image}}" muted playsinline autoplay loop>
+                  <source ng-attr-src="{{d.video}}" type="video/mp4" />
+                </video>
+                <img ng-if="!d.video" ng-src="{{d.image}}" class="card-img-top" alt="{{d.name}}" />
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{d.name}}</h5>
+                <p class="card-text text-muted">{{d.description}}</p>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <span class="fw-semibold">{{d.price | currency:vm.currencySymbol:0}}</span>
+                  <a class="btn btn-sm btn-outline-primary" ng-href="index.html#booking" ng-click="vm.prefill(d)">Book</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h3 class="fw-semibold mb-3">International Destinations</h3>
+        <div class="row g-4">
+          <div class="col-12 col-sm-6 col-lg-4" ng-repeat="d in (vm.destinations | filter:vm.searchFn | filter:vm.countryFilter(false) | orderBy:vm.orderExpr:vm.orderReverse)">
+            <div class="card h-100 destination-card shadow-sm">
+              <div class="position-relative">
+                <span class="badge badge-category" ng-class="vm.badgeClass(d.type)">{{d.type}}</span>
+                <video ng-if="d.video" class="card-img-top" ng-attr-poster="{{d.image}}" muted playsinline autoplay loop>
+                  <source ng-attr-src="{{d.video}}" type="video/mp4" />
+                </video>
+                <img ng-if="!d.video" ng-src="{{d.image}}" class="card-img-top" alt="{{d.name}}" />
+              </div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">{{d.name}}</h5>
+                <p class="card-text text-muted">{{d.description}}</p>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  <span class="fw-semibold">{{d.price | currency:vm.currencySymbol:0}}</span>
+                  <a class="btn btn-sm btn-outline-primary" ng-href="index.html#booking" ng-click="vm.prefill(d)">Book</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12" ng-if="(vm.destinations | filter:vm.searchFn).length === 0">
+            <div class="alert alert-light border d-flex align-items-center" role="alert">
+              <div>No destinations match your filters.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="py-4 bg-dark text-white-50 mt-5">
+      <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+        <span>&copy; <span id="year"></span> Tourizio. All rights reserved.</span>
+        <div class="d-flex gap-3">
+          <a class="link-light link-underline-opacity-0" href="index.html#home">Home</a>
+          <a class="link-light link-underline-opacity-0" href="#">Destinations</a>
+          <a class="link-light link-underline-opacity-0" href="index.html#booking">Book</a>
+          <a class="link-light link-underline-opacity-0" href="index.html#contact">Contact</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      (function() {
+        'use strict';
+        angular.module('tourizioApp', [])
+          .controller('DestinationsController', ['$window', function($window) {
+            var vm = this;
+            vm.destinations = [
+              { id: 'paris-france', name: 'Paris, France', type: 'City', description: 'The city of lights, art, and exquisite cuisine.', price: 1299, popularity: 98, image: 'https://images.unsplash.com/photo-1508057198894-247b23fe5ade?q=80&w=1600&auto=format&fit=crop', video: 'https://cdn.coverr.co/videos/coverr-the-eiffel-tower-0275/1080p.mp4' },
+              { id: 'bali-indonesia', name: 'Bali, Indonesia', type: 'Beach', description: 'Tropical beaches, lush rice terraces, and serene temples.', price: 999, popularity: 95, image: 'https://images.unsplash.com/photo-1493558103817-58b2924bce98?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'machu-picchu-peru', name: 'Machu Picchu, Peru', type: 'Historical', description: 'Ancient Incan citadel set high in the Andes Mountains.', price: 1590, popularity: 92, image: 'https://images.unsplash.com/photo-1549648345-83cb00a7c1a3?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'banff-canada', name: 'Banff, Canada', type: 'Mountain', description: 'Turquoise lakes, snowy peaks, and abundant wildlife.', price: 1190, popularity: 88, image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'queenstown-nz', name: 'Queenstown, New Zealand', type: 'Adventure', description: 'The adventure capital: bungee, jet boating, and epic hikes.', price: 1790, popularity: 86, image: 'https://images.unsplash.com/photo-1473625247510-8ceb1760943f?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'santorini-greece', name: 'Santorini, Greece', type: 'Island', description: 'Iconic whitewashed villages perched over the Aegean Sea.', price: 1290, popularity: 90, image: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'tokyo-japan', name: 'Tokyo, Japan', type: 'City', description: 'Neon-lit streets, world-class cuisine, and tranquil shrines.', price: 1490, popularity: 94, image: 'https://images.unsplash.com/photo-1558981033-5f6a06f82d79?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'maldives', name: 'Maldives', type: 'Beach', description: 'Overwater villas, pristine lagoons, and endless turquoise.', price: 2090, popularity: 91, image: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1600&auto=format&fit=crop', video: 'https://cdn.coverr.co/videos/coverr-maldives-ocean-1597/1080p.mp4' },
+              { id: 'sahara-morocco', name: 'Sahara Desert, Morocco', type: 'Desert', description: 'Golden dunes, camel caravans, and starry desert nights.', price: 1190, popularity: 84, image: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'capetown-southafrica', name: 'Cape Town, South Africa', type: 'Safari', description: 'Table Mountain views and nearby wildlife adventures.', price: 1390, popularity: 87, image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'norway-fjords', name: 'Norwegian Fjords', type: 'Cruise', description: 'Dramatic fjords and quaint villages on scenic cruises.', price: 1890, popularity: 89, image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'patagonia-chile', name: 'Patagonia, Chile', type: 'Mountain', description: 'Jagged peaks, glaciers, and epic trekking routes.', price: 1990, popularity: 85, image: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'amazon-brazil', name: 'Amazon Rainforest, Brazil', type: 'Forest', description: 'Lush biodiversity and river expeditions into the wild.', price: 1590, popularity: 83, image: 'https://images.unsplash.com/photo-1523978591478-c753949ff840?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'rome-italy', name: 'Rome, Italy', type: 'Historical', description: 'Ancient ruins, Baroque fountains, and vibrant street life.', price: 1199, popularity: 93, image: 'https://images.unsplash.com/photo-1544989164-31dc3c645987?q=80&w=1600&auto=format&fit=crop' }
+            ];
+            vm.destinations = vm.destinations.concat([
+              { id: 'jaipur-india', name: 'Jaipur, India', type: 'Historical', country: 'India', description: 'Pink City palaces, forts, and vibrant bazaars.', price: 24999, popularity: 88, image: 'https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'goa-india', name: 'Goa, India', type: 'Beach', country: 'India', description: 'Golden beaches, lively shacks, and Portuguese heritage.', price: 19999, popularity: 90, image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'leh-ladakh-india', name: 'Leh–Ladakh, India', type: 'Mountain', country: 'India', description: 'Himalayan passes, turquoise lakes, and monasteries.', price: 34999, popularity: 85, image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop' },
+              { id: 'kerala-india', name: 'Kerala Backwaters, India', type: 'Forest', country: 'India', description: 'Palm-lined canals, houseboats, and serene villages.', price: 27999, popularity: 86, image: 'https://encrypted-tbn2.gstatic.com/licensed-image?q=tbn:ANd9GcTZfM7EG8N1ITVwVeyfmy6zm6Z9xPu1lYmj7OHg_hzKOjbYPFO_FPfG9WqXYYnfIaE0S7T6rb9PEMhSCTulxtWbzemgvH6xY7zsXCnrVg' }
+            ]);
+            vm.types = ['Beach', 'Mountain', 'City', 'Historical', 'Adventure', 'Island', 'Safari', 'Desert', 'Cruise', 'Forest'];
+            vm.currencySymbol = 'USD$';
+            vm.query = '';
+            vm.type = '';
+            vm.sort = 'popular';
+            vm.searchFn = function(item) {
+              var q = (vm.query || '').toLowerCase();
+              var typeOk = !vm.type || item.type === vm.type;
+              var qOk = !q || item.name.toLowerCase().indexOf(q) !== -1 || item.description.toLowerCase().indexOf(q) !== -1 || (item.country || '').toLowerCase().indexOf(q) !== -1;
+              return typeOk && qOk;
+            };
+            vm.countryFilter = function(isIndia) {
+              return function(item) {
+                var isIn = (item.country || '').toLowerCase() === 'india';
+                return isIndia ? isIn : !isIn;
+              };
+            };
+            vm.badgeClass = function(type) {
+              switch (type) {
+                case 'Beach': return 'bg-info';
+                case 'Mountain': return 'bg-success';
+                case 'City': return 'bg-dark';
+                case 'Historical': return 'bg-warning text-dark';
+                case 'Adventure': return 'bg-danger';
+                case 'Island': return 'bg-primary';
+                case 'Safari': return 'bg-success';
+                case 'Desert': return 'bg-warning text-dark';
+                case 'Cruise': return 'bg-primary';
+                case 'Forest': return 'bg-success';
+                default: return 'bg-secondary';
+              }
+            };
+            Object.defineProperty(vm, 'orderExpr', {
+              get: function() {
+                if (vm.sort === 'popular') return '-popularity';
+                if (vm.sort === 'priceAsc') return 'price';
+                if (vm.sort === 'priceDesc') return '-price';
+                return '-popularity';
+              }
+            });
+            Object.defineProperty(vm, 'orderReverse', {
+              get: function() { return false; }
+            });
+            vm.reset = function() {
+              vm.query = '';
+              vm.type = '';
+              vm.sort = 'popular';
+            };
+            // vm.photoFor no longer needed as direct image URLs are used
+            vm.prefill = function(d) {
+              try {
+                sessionStorage.setItem('prefillDestinationId', d.id);
+              } catch (e) {}
+              $window.location.href = 'index.html#booking';
+            };
+          }]);
+        document.addEventListener('DOMContentLoaded', function() {
+          var y = document.getElementById('year');
+          if (y) y.textContent = new Date().getFullYear();
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"></script>
+  </body>
+</html>

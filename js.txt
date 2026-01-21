@@ -1,0 +1,212 @@
+// Mock data for destinations
+const DESTINATIONS = [
+  {
+    id: 'paris-france',
+    name: 'Paris, France',
+    type: 'City',
+    description: 'The city of lights, art, and exquisite cuisine.',
+    price: 1299,
+    popularity: 98,
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=1600&auto=format&fit=crop'
+  },
+  {
+    id: 'bali-indonesia',
+    name: 'Bali, Indonesia',
+    type: 'Beach',
+    description: 'Tropical beaches, lush rice terraces, and serene temples.',
+    price: 999,
+    popularity: 95,
+    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop'
+  },
+  {
+    id: 'machu-picchu-peru',
+    name: 'Machu Picchu, Peru',
+    type: 'Historical',
+    description: 'Ancient Incan citadel set high in the Andes Mountains.',
+    price: 1590,
+    popularity: 92,
+    image: 'https://images.unsplash.com/photo-1549887534-1541e9326642?q=80&w=1600&auto=format&fit=crop'
+  },
+  {
+    id: 'banff-canada',
+    name: 'Banff, Canada',
+    type: 'Mountain',
+    description: 'Turquoise lakes, snowy peaks, and abundant wildlife.',
+    price: 1190,
+    popularity: 88,
+    image: 'https://images.unsplash.com/photo-1508261303786-0e3b5a7cba5f?q=80&w=1600&auto=format&fit=crop'
+  },
+  {
+    id: 'queenstown-nz',
+    name: 'Queenstown, New Zealand',
+    type: 'Adventure',
+    description: 'The adventure capital: bungee, jet boating, and epic hikes.',
+    price: 1790,
+    popularity: 86,
+    image: 'https://images.unsplash.com/photo-1472707855896-60f95c8a16ab?q=80&w=1600&auto=format&fit=crop'
+  }
+];
+
+// Helpers
+const formatCurrency = (amount) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(amount);
+
+function renderDestinations(list) {
+  const grid = document.getElementById('destinationsGrid');
+  grid.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+
+  list.forEach((d) => {
+    const col = document.createElement('div');
+    col.className = 'col-12 col-sm-6 col-lg-4';
+    col.innerHTML = `
+      <div class="card h-100 destination-card shadow-sm">
+        <div class="position-relative">
+          <span class="badge bg-primary badge-category">${d.type}</span>
+          <img src="${d.image}" class="card-img-top" alt="${d.name}" />
+        </div>
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">${d.name}</h5>
+          <p class="card-text text-muted">${d.description}</p>
+          <div class="mt-auto d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">${formatCurrency(d.price)}</span>
+            <button class="btn btn-sm btn-outline-primary" data-destination-id="${d.id}">Book</button>
+          </div>
+        </div>
+      </div>
+    `;
+    fragment.appendChild(col);
+  });
+
+  grid.appendChild(fragment);
+}
+
+function populateBookingDestinations(list) {
+  const select = document.getElementById('destinationSelect');
+  select.innerHTML = '<option value="">Select a destination...</option>' +
+    list.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+}
+
+function attachCardBookHandlers() {
+  document.getElementById('destinationsGrid').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-destination-id]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-destination-id');
+    const select = document.getElementById('destinationSelect');
+    select.value = id;
+    document.querySelector('a[href="#booking"]').focus();
+    document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+  });
+}
+
+function setupFilters() {
+  const searchInput = document.getElementById('searchInput');
+  const typeSelect = document.getElementById('typeSelect');
+  const sortSelect = document.getElementById('sortSelect');
+  const filterForm = document.getElementById('filterForm');
+
+  const apply = () => {
+    const q = searchInput.value.trim().toLowerCase();
+    const type = typeSelect.value;
+    const sort = sortSelect.value;
+
+    let list = DESTINATIONS.filter(d =>
+      (!type || d.type === type) &&
+      (d.name.toLowerCase().includes(q) || d.description.toLowerCase().includes(q))
+    );
+
+    if (sort === 'popular') list = list.sort((a,b) => b.popularity - a.popularity);
+    if (sort === 'priceAsc') list = list.sort((a,b) => a.price - b.price);
+    if (sort === 'priceDesc') list = list.sort((a,b) => b.price - a.price);
+
+    renderDestinations(list);
+  };
+
+  searchInput.addEventListener('input', apply);
+  typeSelect.addEventListener('change', apply);
+  sortSelect.addEventListener('change', apply);
+  filterForm.addEventListener('reset', () => {
+    setTimeout(apply, 0);
+  });
+
+  apply();
+}
+
+function setupBookingForm() {
+  const form = document.getElementById('bookingForm');
+  const alertBox = document.getElementById('bookingAlert');
+  const dateInput = document.getElementById('dateInput');
+
+  // Set min date to today
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  dateInput.min = `${yyyy}-${mm}-${dd}`;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+
+    const payload = {
+      destinationId: document.getElementById('destinationSelect').value,
+      date: document.getElementById('dateInput').value,
+      people: Number(document.getElementById('peopleInput').value),
+      name: document.getElementById('nameInput').value,
+      email: document.getElementById('emailInput').value,
+      notes: document.getElementById('notesInput').value
+    };
+
+    // Mock submit
+    console.log('Booking request:', payload);
+
+    alertBox.classList.remove('d-none');
+    form.reset();
+    form.classList.remove('was-validated');
+    // Re-apply min date after reset
+    dateInput.min = `${yyyy}-${mm}-${dd}`;
+  });
+}
+
+function setupContactForm() {
+  const form = document.getElementById('contactForm');
+  const alertBox = document.getElementById('contactAlert');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+    const payload = {
+      name: document.getElementById('contactName').value,
+      email: document.getElementById('contactEmail').value,
+      subject: document.getElementById('contactSubject').value,
+      message: document.getElementById('contactMessage').value
+    };
+    console.log('Contact message:', payload);
+    alertBox.classList.remove('d-none');
+    form.reset();
+    form.classList.remove('was-validated');
+  });
+}
+
+function setYear() {
+  const y = document.getElementById('year');
+  if (y) y.textContent = new Date().getFullYear();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderDestinations(DESTINATIONS);
+  populateBookingDestinations(DESTINATIONS);
+  attachCardBookHandlers();
+  setupFilters();
+  setupBookingForm();
+  setupContactForm();
+  setYear();
+});
+
+

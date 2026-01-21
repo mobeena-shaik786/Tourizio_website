@@ -1,0 +1,32 @@
+<nav class="navbar">
+  <a routerLink="/">Home</a>
+  <a routerLink="/destinations">Destinations</a>
+  <a routerLink="#">Book a Tour</a>
+  <a routerLink="#">Contact Us</a>
+</nav>
+<section class="hero">
+  <h1>Welcome to Tourizio!</h1>
+  <p>Discover amazing destinations and book your perfect trip.</p>
+  <button routerLink="/destinations">Get Started</button>
+</section>
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  padding: 15px;
+  background: #0fa8e2;
+}
+.navbar a {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+}
+.hero {
+  text-align: center;
+  padding: 80px 10px 20px 10px;
+  background: url('assets/hero-bg.jpg') no-repeat center center/cover;
+  color: #333;
+}
+@media (max-width: 600px) {
+  .navbar { flex-direction: column; }
+  .hero { padding: 40px 5px; }
+}

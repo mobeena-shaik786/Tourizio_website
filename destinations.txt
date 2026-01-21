@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Tourizio – Destinations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <a class="logo" href="index.html">Tourizio</a>
+      <span class="tagline">Discover India your way</span>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a class="active" href="destinations.html">Destinations</a>
+      <a href="#" onclick="return false;">Bookings</a>
+      <a href="#" onclick="return false;">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero slim">
+    <div class="hero-content">
+      <h1>Find your next destination</h1>
+      <p>Search, filter by type and budget, and sort by rating or price.</p>
+      <div class="search-row">
+        <input id="q" type="text" placeholder="Search by place, state, type..." />
+        <select id="type"></select>
+        <input id="minPrice" type="number" placeholder="Min ₹" />
+        <input id="maxPrice" type="number" placeholder="Max ₹" />
+        <select id="sortBy">
+          <option value="ratingHighLow">Top Rated</option>
+          <option value="priceLowHigh">Price: Low to High</option>
+          <option value="priceHighLow">Price: High to Low</option>
+          <option value="nameAZ">Name A-Z</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none;">No destinations match your filters.</div>
+  </section>
+
+  <footer class="footer">
+    <div>© <span id="year-dest"></span> Tourizio. All rights reserved.</div>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('year-dest').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
